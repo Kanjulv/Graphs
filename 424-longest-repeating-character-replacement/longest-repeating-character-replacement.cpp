@@ -15,13 +15,14 @@ public:
             
             maxFreq = max(maxFreq, count[s[right]]);
 
-            if((right - left + 1) - maxFreq > k)
+            if((right - left + 1) - maxFreq <= k)
             {
+                maxLen = max(maxLen , right - left + 1);
+            }
+            else{
                 count[s[left]]--;
                 left++;
             }
-
-            maxLen = max(maxLen , right - left + 1);
         }
 
         return maxLen;
