@@ -1,72 +1,82 @@
-#include <string>
-#include <unordered_map>
-#include <climits> // For INT_MAX
-
 class Solution {
 public:
-    string minWindow(string s, string t) {
+
+bool isSame(unordered_map<char, int>& freq1, unordered_map<char, int>& freq2)
+{
+    // Iterate through the target frequencies (freq2)
+    for(auto const& [key, val] : freq2) // Using structured binding for C++17, equivalent to auto x : freq2
+    {
+        // If character from freq2 is not in freq1, or its count in freq1 is less than in freq2
+        if(freq1.find(key) == freq1.end() || freq1[key] < val)
+        {
+            return false; // Not a valid window
+        }
+    }
+    return true; // All characters in freq2 are present in freq1 with sufficient counts
+}
+
+
+
+string minWindow(string s, string t) {
+
         int n1 = s.length();
         int n2 = t.length();
 
-        if (n2 == 0) { // If t is empty, any window is valid, so s is the min window
-            return ""; // Or s, depending on interpretation. Typically, an empty string if t is empty.
-        }
-        if (n1 == 0 || n1 < n2) {
-            return ""; // If s is empty, or s is shorter than t, no valid window
-        }
+        // Handle edge cases: if t is empty, return an empty string.
+        // If s is empty or shorter than t, no valid window exists.
+        if (n2 == 0) return "";
+        if (n1 == 0 || n1 < n2) return "";
 
-        unordered_map<char, int> targetFreq; // Frequency of characters in t
-        for (char c : t) {
-            targetFreq[c]++;
+        unordered_map<char, int> freq1; // Frequencies of characters in the current window (s)
+        unordered_map<char, int> freq2; // Frequencies of characters in the target string (t)
+
+        // Populate freq2 with target frequencies from string t
+        for(int i = 0; i < n2; i++)
+        {
+            freq2[t[i]]++;
         }
 
         int left = 0;
-        int right = 0;
-        int matchedCount = 0; // Count of characters in current window that match targetFreq requirements
-        int minLen = INT_MAX;
-        int minStart = 0;
+        int minLen = INT_MAX; // Initialize minLen to a very large value
+        int minWindowStart = 0; // Stores the starting index of the minimum window found
 
-        unordered_map<char, int> windowFreq; // Frequency of characters in the current window
-
-        while (right < n1) {
-            char currentChar = s[right];
-
-            // Expand the window
-            if (targetFreq.count(currentChar)) { // If current character is needed
-                windowFreq[currentChar]++;
-                if (windowFreq[currentChar] <= targetFreq[currentChar]) {
-                    // This character contributes to matching the target
-                    matchedCount++;
-                }
+        for(int right = 0; right < n1; right++)
+        {
+            // Add the current character s[right] to the window's frequency map
+            // Only add if it's a character we care about (present in freq2)
+            if(freq2.count(s[right])) // Using .count() is safer than .find() != .end() for presence check
+            {
+                freq1[s[right]]++;
             }
+            
+            // If the current window (from 'left' to 'right') is valid
+            while(isSame(freq1, freq2))
+            {
+                // Calculate the length of the current valid window
+                int currentWindowLen = right - left + 1;
 
-            // Try to shrink the window if we have a valid candidate
-            while (matchedCount == n2) { // We have found a window that contains all characters of t
-                // Update minimum window found so far
-                if (right - left + 1 < minLen) {
-                    minLen = right - left + 1;
-                    minStart = left;
+                // If this window is shorter than the minimum found so far
+                if(currentWindowLen < minLen)
+                {
+                    minLen = currentWindowLen;
+                    minWindowStart = left; // Store the starting index of this shorter window
                 }
 
-                char charFromLeft = s[left];
-
-                // Shrink the window from the left
-                if (targetFreq.count(charFromLeft)) { // If the character being removed was needed
-                    if (windowFreq[charFromLeft] <= targetFreq[charFromLeft]) {
-                        // This character was contributing to the matchedCount, so decrement it
-                        matchedCount--;
-                    }
-                    windowFreq[charFromLeft]--;
+                // Attempt to shrink the window from the left
+                // Only decrement if the character at s[left] is one we care about (in freq2)
+                if(freq2.count(s[left])) {
+                    freq1[s[left]]--;
                 }
-                left++;
+                left++; // Move left pointer
             }
-            right++;
         }
 
         if (minLen == INT_MAX) {
             return ""; // No valid window found
-        } else {
-            return s.substr(minStart, minLen);
+        }
+        else {
+            // Return the minimum window substring using the stored start index and length
+            return s.substr(minWindowStart, minLen);
         }
     }
 };
