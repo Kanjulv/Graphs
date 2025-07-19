@@ -1,58 +1,72 @@
 class Solution {
 public:
-vector <int> nextSmallestElement(vector <int> arr, int n)
-{
-    stack <int> stack;
-    stack.push(-1);
-    vector <int> ans(n); //Answer array
 
-    for(int i = n-1 ; i >= 0; i--)
+vector<int> prevSmallest(vector<int>& heights)
+{
+    int n = heights.size();
+    vector<int> ans(n);
+    stack<int> st;
+
+    st.push(-1);
+
+    for(int i = 0; i < n; i++)
     {
-        while(stack.top() != -1 && arr[i] <= arr[stack.top()])
+        while(st.top() != -1 && heights[i] <= heights[st.top()])
         {
-        stack.pop();
+            st.pop();
         }
-        ans[i] = stack.top();
-        stack.push(i);
+
+        ans[i] = st.top();
+        st.push(i);
     }
+
     return ans;
+
 }
 
-vector <int> prevSmallestElement(vector <int> arr, int n)
+vector<int> nextSmallest(vector<int>& heights)
 {
-    stack <int> stack;
-    stack.push(-1);
-    vector <int> ans(n); //Answer array
+    int n = heights.size();
+    vector<int> ans(n);
+    stack<int> st;
 
-    for(int i = 0 ; i < n; i++)
+    st.push(-1);
+
+    for(int i = n-1; i >= 0; i--)
     {
-        while(stack.top() != -1 && arr[i] <= arr[stack.top()])
+        while(st.top() != -1 && heights[i] <= heights[st.top()])
         {
-        stack.pop();
+            st.pop();
         }
-        ans[i] = stack.top();
-        stack.push(i);
-    }
-    return ans;
-}
 
+        ans[i] = st.top();
+        st.push(i);
+    }
+
+    return ans;
+
+}
     int largestRectangleArea(vector<int>& heights) {
-        int area = INT_MIN;
-        int n = heights.size();
-        vector <int> next = nextSmallestElement(heights, n);
-        vector <int> prev = prevSmallestElement(heights, n);
 
-        for(int i = 0; i < n; i++)
-    {
-        int length = heights[i];
-        if(next[i] == -1)
+        vector<int> nextSmallestArr = nextSmallest(heights);
+        vector<int> prevSmallestArr = prevSmallest(heights);
+
+        int finalArea = INT_MIN;
+
+        for(int i = 0 ; i < heights.size(); i++)
         {
-            next[i] = n;
+            if(nextSmallestArr[i] == -1)
+            {
+                nextSmallestArr[i] = heights.size(); 
+            }
+            int height = heights[i];
+            int width = nextSmallestArr[i] - prevSmallestArr[i] - 1;
+
+            int currArea = width * height;
+
+            finalArea = max(currArea, finalArea);
         }
-        int breadth = next[i]-prev[i]-1;
-        int areaSeperate = length*breadth;
-        area = max(area, areaSeperate);
-    }
-    return area;
+
+        return finalArea;
     }
 };
