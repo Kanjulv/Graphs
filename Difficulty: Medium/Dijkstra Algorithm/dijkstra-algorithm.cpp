@@ -12,8 +12,8 @@ class Solution {
             int v = edges[i][1];
             int w = edges[i][2];
             
-            adj[u].push_back(make_pair(v, w));
-            adj[v].push_back(make_pair(u, w));
+            adj[u].push_back({v, w});
+            adj[v].push_back({u, w});
         }
         
         //Creating the ans vector
