@@ -5,22 +5,27 @@ public:
         int n = nums.size();
         vector<int> ans(n, 1);
 
+        int i = 0;
         int curr = 1;
 
-        for(int i = 0; i < n; i++)
+        while(i < n)
         {
             ans[i] *= curr;
             curr *= nums[i];
+            i++;
         }
 
+        i = n - 1;
         curr = 1;
 
-        for(int i = n-1; i >= 0; i--)
+        while(i >= 0)
         {
             ans[i] *= curr;
             curr *= nums[i];
+            i--;
         }
 
         return ans;
     }
 };
+
