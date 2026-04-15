@@ -1,24 +1,19 @@
 class Solution {
 public:
     bool isAnagram(string s, string t) {
+        
+        if(s.size() != t.size()) return false;
 
-        int n1 = s.size();
-        int n2 = t.size();
+        unordered_map<char, int> smap(0);
+        unordered_map<char, int> tmap(0);
 
-        unordered_map<char, int> freq1(0);
-        unordered_map<char, int> freq2(0);
-
-        for(int i = 0; i < n1; i++)
+        for(int i = 0; i < s.size(); i++)
         {
-            freq1[s[i]]++;
+            smap[s[i]]++;
+            tmap[t[i]]++;
         }
 
-        for(int i = 0; i < n2; i++)
-        {
-            freq2[t[i]]++;
-        }
-
-        return freq1 == freq2 ? true : false;
-
+        if(smap == tmap) return true;
+        else return false;
     }
 };
